@@ -3,159 +3,162 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Placeholder Landing - Math Love Quiz</title>
+  <title>Math Love Quiz</title>
   <!-- MathJax for rendering equations -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      background: #f9f9f9;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    #quiz, #heartPlot {
-      display: none;
-    }
-    input[type="text"] {
-      padding: 8px;
-      width: 60%;
-      font-size: 1rem;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      margin-top: 10px;
-      cursor: pointer;
-      background: #e91e63;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-    }
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    canvas {
-      border: 1px solid #ddd;
-      margin-top: 20px;
-    }
-    .eq {
-      margin: 10px 0;
-      font-size: 1.2rem;
-    }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #ffeef0; color: #333; margin:0; }
+    .container { max-width: 500px; margin: 40px auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h1, h2 { margin: 0 0 16px; color: #e91e63; }
+    .eq { min-height: 1.6em; margin: 12px 0; font-size: 1.4rem; }
+    #feedback { min-height:1.2em; color: #d32f2f; margin-bottom: 8px; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    .mid-row, .sup-row, .ctrl-row { display: flex; gap: 8px; margin-top: 8px; justify-content: center; }
+    .btn { flex:1; padding: 14px 0; font-size: 1.1rem; background: #e91e63; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #d81b60; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    .btn.sup-active { background: #888; }
+    #submitBtn { background: #4caf50; }
+    #submitBtn:hover { background: #43a047; }
+    #overallEq { font-size: 1.3rem; }
+    #plotSection { display: none; margin-top: 20px; text-align: center; }
+    #desmosLink { padding: 12px 20px; display: inline-block; background: #4a154b; color: #fff; border-radius: 8px; text-decoration: none; font-size: 1.1rem; }
+    #desmosLink:hover { background: #3b0f3d; }
   </style>
 </head>
 <body>
   <div id="landing" class="container">
     <h1>Placeholder Title</h1>
     <p>Placeholder intro text goes here.</p>
-    <button id="startBtn">Let's Start</button>
+    <button class="btn" id="startBtn">Let's Start</button>
   </div>
 
-  <div id="quiz" class="container">
-    <h2 id="questionText">Placeholder Question 1?</h2>
-    <input type="text" id="answerInput" placeholder="Type your answer here">
-    <br>
-    <button id="submitBtn" disabled>Submit</button>
-
-    <div class="eq">
-      <strong>Current Answer:</strong> <span id="currentEq"></span>
+  <div id="quiz" class="container" style="display:none;">
+    <h2 id="questionText">Placeholder Question</h2>
+    <div id="currentInput" class="eq"></div>
+    <div class="keypad" id="numPad"></div>
+    <div class="mid-row">
+      <button class="btn" id="btn0">0</button>
+      <button class="btn" id="btnPlus">+</button>
+      <button class="btn" id="btnMinus">-</button>
     </div>
-    <div class="eq">
-      <strong>Overall Equation:</strong> <span id="overallEq"></span>
+    <div class="sup-row">
+      <button class="btn" id="btnX">x</button>
+      <button class="btn" id="btnSup">^</button>
+      <button class="btn" id="btnY">y</button>
     </div>
+    <div id="feedback"></div>
+    <div class="ctrl-row">
+      <button class="btn" id="clearBtn">Clear</button>
+      <button class="btn" id="deleteBtn">Delete</button>
+      <button class="btn" id="submitBtn" disabled>Submit</button>
+    </div>
+    <div class="eq"><strong>Built Equation:</strong> <span id="overallEq"></span></div>
   </div>
 
-  <div id="heartPlot" class="container">
-    <h2>You did it!</h2>
-    <button id="plotBtn">Plot It</button>
-    <canvas id="heartCanvas" width="400" height="400"></canvas>
+  <div id="plotSection" class="container">
+    <h2>Your Heart Equation:</h2>
+    <div class="eq">\((x^2+y^2-1)^3 - x^2y^3 = 0\)</div>
+    <a id="desmosLink" href="https://www.desmos.com/calculator/oshra5xzsc" target="_blank">
+      View on Desmos
+    </a>
   </div>
 
   <script>
-    // Quiz logic
-    const parts = [];
-    const questions = [
-      { text: 'Placeholder: What expression simplifies to x^2 + y^2 - 1?' },
-      { text: 'Placeholder: What exponent multiplies the first part by 3?' },
-      { text: 'Placeholder: What term is -x^2 y^3?' }
-    ];
-    let stage = 0;
-    const landing = document.getElementById('landing');
-    const quiz = document.getElementById('quiz');
-    const heartPlot = document.getElementById('heartPlot');
-    const startBtn = document.getElementById('startBtn');
-    const questionText = document.getElementById('questionText');
-    const answerInput = document.getElementById('answerInput');
-    const submitBtn = document.getElementById('submitBtn');
-    const currentEq = document.getElementById('currentEq');
-    const overallEq = document.getElementById('overallEq');
-    const plotBtn = document.getElementById('plotBtn');
-    const canvas = document.getElementById('heartCanvas');
-    const ctx = canvas.getContext('2d');
+    document.addEventListener('DOMContentLoaded', () => {
+      const correctAnswers = ['x^2+y^2-1','3','-x^2y^3'];
+      let inSup = false;
+      let inputTokens = [];
+      const parts = [];
+      const questions = [
+        { text: 'Placeholder: What expression equals x² + y² − 1?' },
+        { text: 'Placeholder: What exponent?' },
+        { text: 'Placeholder: What term?' }
+      ];
+      let stage = 0;
 
-    startBtn.onclick = () => {
-      landing.style.display = 'none';
-      quiz.style.display = 'block';
-      loadQuestion();
-    };
-    answerInput.oninput = () => {
-      submitBtn.disabled = answerInput.value.trim() === '';
-    };
-    submitBtn.onclick = () => {
-      const ans = answerInput.value.trim();
-      parts.push(ans);
-      currentEq.innerHTML = `\\(${ans}\\)`;
-      const overall = parts.map(p => `(${p})`).join('');
-      overallEq.innerHTML = `\\(${overall}\\)`;
-      MathJax.typeset();
-      stage++;
-      answerInput.value = '';
-      submitBtn.disabled = true;
-      if (stage < questions.length) {
-        loadQuestion();
-      } else {
-        // Done questions
-        quiz.style.display = 'none';
-        heartPlot.style.display = 'block';
+      const landing = document.getElementById('landing');
+      const quiz = document.getElementById('quiz');
+      const plotSection = document.getElementById('plotSection');
+      const startBtn = document.getElementById('startBtn');
+      const questionText = document.getElementById('questionText');
+      const currentInput = document.getElementById('currentInput');
+      const numPad = document.getElementById('numPad');
+      const btn0 = document.getElementById('btn0');
+      const btnPlus = document.getElementById('btnPlus');
+      const btnMinus = document.getElementById('btnMinus');
+      const btnX = document.getElementById('btnX');
+      const btnY = document.getElementById('btnY');
+      const btnSup = document.getElementById('btnSup');
+      const clearBtn = document.getElementById('clearBtn');
+      const deleteBtn = document.getElementById('deleteBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      const feedback = document.getElementById('feedback');
+      const overallEq = document.getElementById('overallEq');
+
+      startBtn.onclick = () => { landing.style.display = 'none'; quiz.style.display = 'block'; loadQuestion(); };
+
+      for (let i = 1; i <= 9; i++) {
+        const b = document.createElement('button');
+        b.className = 'btn'; b.textContent = i;
+        b.onclick = () => appendToken(i.toString());
+        numPad.appendChild(b);
       }
-    };
-    plotBtn.onclick = () => {
-      plotHeart();
-    };
+      btn0.onclick = () => appendToken('0');
+      btnPlus.onclick = () => appendToken('+');
+      btnMinus.onclick = () => appendToken('-');
+      btnX.onclick = () => appendToken('x');
+      btnY.onclick = () => appendToken('y');
+      btnSup.onclick = () => { inSup = !inSup; btnSup.classList.toggle('sup-active', inSup); };
 
-    function loadQuestion() {
-      questionText.textContent = questions[stage].text;
-      currentEq.innerHTML = '';
-      overallEq.innerHTML = parts.map(p => `(${p})`).join('');
-      MathJax.typeset();
-    }
+      clearBtn.onclick = () => { inputTokens = []; inSup = false; btnSup.classList.remove('sup-active'); renderInput(); submitBtn.disabled = true; feedback.textContent = ''; };
+      deleteBtn.onclick = () => { inputTokens.pop(); renderInput(); submitBtn.disabled = inputTokens.length === 0; feedback.textContent = ''; };
 
-    // Draw implicit heart: (x^2+y^2-1)^3 - x^2 y^3 = 0
-    function plotHeart() {
-      const W = canvas.width;
-      const H = canvas.height;
-      const scale = 1.5;
-      const thresh = 0.02;
-      ctx.clearRect(0,0,W,H);
-      ctx.fillStyle = 'red';
-      for (let i = 0; i < W; i++) {
-        for (let j = 0; j < H; j++) {
-          const x = (i / W) * 2 * scale - scale;
-          const y = scale - (j / H) * 2 * scale;
-          const f = Math.pow(x*x + y*y - 1, 3) - x*x * Math.pow(y, 3);
-          if (Math.abs(f) < thresh) {
-            ctx.fillRect(i, j, 1, 1);
-          }
+      submitBtn.onclick = () => {
+        let rawAns = inputTokens.map(t => t.raw).join('');
+        rawAns = rawAns.replace(/[–—−]/g, '-').replace(/\s+/g, '');
+        const expected = correctAnswers[stage];
+        if (rawAns !== expected) { feedback.textContent = `You entered "${rawAns}" but expected "${expected}".`; return; }
+        parts.push(rawAns);
+        stage++;
+        if (stage < questions.length) {
+          loadQuestion();
+        } else {
+          quiz.style.display = 'none';
+          plotSection.style.display = 'block';
         }
+      };
+
+      function appendToken(label) {
+        const sup = inSup;
+        const raw = sup ? '^' + label : label;
+        inputTokens.push({ label, raw, sup });
+        inSup = false; btnSup.classList.remove('sup-active'); renderInput(); submitBtn.disabled = inputTokens.length === 0;
       }
-    }
+
+      function renderInput() {
+        currentInput.innerHTML = inputTokens.map(t => t.sup ? `<sup>${t.label}</sup>` : t.label).join('');
+      }
+
+      function buildOverall() {
+        if (parts.length === 0) return '';
+        let eq = parts[0];
+        if (parts.length >= 2) eq = `(${parts[0]})<sup>${parts[1]}</sup>`;
+        if (parts.length === 3) eq = `(${parts[0]})<sup>${parts[1]}</sup>${parts[2]}`;
+        return `\\(${eq}\\)`;
+      }
+
+      function loadQuestion() {
+        questionText.textContent = questions[stage].text;
+        inputTokens = [];
+        inSup = false;
+        btnSup.classList.remove('sup-active');
+        renderInput();
+        submitBtn.disabled = true;
+        feedback.textContent = '';
+        overallEq.innerHTML = buildOverall();
+      }
+    });
   </script>
 </body>
 </html>
