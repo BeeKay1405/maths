@@ -53,7 +53,7 @@
       <button class="btn" id="deleteBtn">Delete</button>
       <button class="btn" id="submitBtn" disabled>Submit</button>
     </div>
-    <div class="eq"><strong>Built Equation:</strong> <span id="overallEq"></span></div>
+    <div class="eq"><strong>Unlocked Equation:</strong> <span id="overallEq"></span></div>
   </div>
 
   <div id="plotSection" class="container">
@@ -146,14 +146,17 @@
         let rawAns = inputTokens.map(t => t.raw).join('');
         rawAns = rawAns.replace(/[–—−]/g, '-').replace(/\s+/g, '');
         const expected = correctAnswers[stage];
-        if (rawAns !== expected) { feedback.textContent = `You entered "${rawAns}" but expected "${expected}".`; return; }
+        if (rawAns !== expected) { feedback.textContent = `Not quite, Try Again :)`; return; }
         parts.push(rawAns);
         stage++;
         if (stage < questions.length) {
+          overallEq.innerHTML = buildOverall();
+          MathJax.typesetPromise([overallEq]);
           loadQuestion();
         } else {
           quiz.style.display = 'none';
           plotSection.style.display = 'block';
+          MathJax.typesetPromise();
         }
       };
 
@@ -171,8 +174,8 @@
       function buildOverall() {
         if (parts.length === 0) return '';
         let eq = parts[0];
-        if (parts.length >= 2) eq = `(${parts[0]})<sup>${parts[1]}</sup>`;
-        if (parts.length === 3) eq = `(${parts[0]})<sup>${parts[1]}</sup>${parts[2]}`;
+        if (parts.length >= 2) eq = `(${parts[0]})^{${parts[1]}}`;
+        if (parts.length === 3) eq = `(${parts[0]})^{${parts[1]}}${parts[2]}`;
         return `\\(${eq}\\)`;
       }
 
@@ -180,6 +183,7 @@
         // inject HTML (so our <strong> and math delimiters survive)
         questionText.innerHTML = questions[stage].text;
         // clear inputs, feedback, etc.
+        inputTokens = [];
         feedback.textContent = '';
         currentInput.innerHTML = '';
         submitBtn.disabled = true;
