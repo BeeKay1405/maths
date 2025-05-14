@@ -71,10 +71,38 @@
       let inputTokens = [];
       const parts = [];
       const questions = [
-        { text: 'Placeholder: What expression equals x² + y² − 1?' },
-        { text: 'Placeholder: What exponent?' },
-        { text: 'Placeholder: What term?' }
-      ];
+        {
+          text: `
+            Under the glow of lanterns in Anushka’s secret garden, Abhash stands at a point \\(P(x,y)\\) so that the sum of the squares of his eastward and northward steps from the marble fountain at the origin always equals one “heartbeat.”
+            Define a function \\(F(x,y)\\) so that his eternal path is given by
+            \\[
+              F(x,y) = 0
+            \\]
+            Find \\(F(x,y)\\).
+          `
+        },
+        {
+          text: `
+            Abhash inscribes two secret alcoves whose distances (in paces) from Anushka’s fountain satisfy
+            \\[
+              x^2 - 4x + c = 0
+            \\]
+            As his heart’s gift—keeping their spirits precisely two paces apart—he asks:
+            <strong>What must \\(c\\) be so that the two roots of this equation differ by 2?</strong>
+          `
+        },
+        {
+          text: `
+            Beneath the silvery wisteria arch in Anushka’s hedge-maze, Abhash composes his “Harmony Function” of their love:
+            \\[
+              H(x,y) = -\\frac{x^3y^4}{12}
+            \\]
+            where \\(x\\) and \\(y\\) measure his secret paces east and north.
+            He then inquires: <strong>What is the mixed partial derivative \\(\\displaystyle \\frac{\\partial^2 H}{\\partial x\\,\\partial y}\\)?</strong>
+          `
+        }
+];
+
       let stage = 0;
 
       const landing = document.getElementById('landing');
@@ -149,14 +177,17 @@
       }
 
       function loadQuestion() {
-        questionText.textContent = questions[stage].text;
-        inputTokens = [];
+        // inject HTML (so our <strong> and math delimiters survive)
+        questionText.innerHTML = questions[stage].text;
+        // clear inputs, feedback, etc.
+        feedback.textContent = '';
+        currentInput.innerHTML = '';
+        submitBtn.disabled = true;
         inSup = false;
         btnSup.classList.remove('sup-active');
-        renderInput();
-        submitBtn.disabled = true;
-        feedback.textContent = '';
-        overallEq.innerHTML = buildOverall();
+
+        // now re-run MathJax on just these new nodes
+        MathJax.typesetPromise([questionText]).catch(console.error);
       }
     });
   </script>
